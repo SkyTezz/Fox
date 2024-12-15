@@ -1,29 +1,28 @@
 blueprint:
-  name: ZHA Remote - Rozšířený ovladač se scénami a barvami
+  name: ZHA Remote - Universal Control (EN)
   description: >
-    Rozšířený univerzální blueprint pro ZHA dálkový ovladač (např. Ikea STYRBAR E2001/E2002).
-    Umožňuje nastavit akce pro single/double/triple klik na horní, spodní, levé a pravé tlačítko
-    i akce při držení tlačítka (hold) pro zvýšení/snížení jasu (horní/dolní) a při držení
-    levého/pravého tlačítka (např. změna scény).
-
-    Obsahuje možnost ovlivnit, zda se při držení (hold) mají akce aplikovat pouze na zapnutá
-    světla, a to zvlášť pro horní/dolní tlačítko (jas) a zvlášť pro levé/pravé tlačítko (scény).
-
-    Navíc můžete přes inputy vybrat konkrétní scény či barvy (např. scény pro levé a pravé tlačítko),
-    aniž byste museli psát kód. Barvy lze nastavit přes akce ve výběru (action selector).
-
+    A universal blueprint for a ZHA remote (e.g., Ikea STYRBAR E2001/E2002)
+    that supports single, double, triple clicks on top, bottom, left, and right buttons,
+    as well as hold actions (increase/decrease brightness on top/bottom and custom hold actions on left/right).
+    
+    Features:
+    - Configurable delay to differentiate single/double/triple clicks.
+    - Option to apply hold actions for brightness only on currently turned-on lights.
+    - Option to apply hold actions for left/right only on currently turned-on lights as well.
+  
   domain: automation
+
   input:
     remote:
-      name: ZHA Dálkový ovladač
-      description: Vyberte zařízení ovladače ZHA.
+      name: ZHA Remote
+      description: Select your ZHA remote device.
       selector:
         device:
           integration: zha
 
     wait_time:
-      name: Čas pro rozlišení počtu stisků (s)
-      description: Doba, během které se čeká na další stisk pro dvojité/trojité kliknutí.
+      name: Delay between clicks (seconds)
+      description: Time used to differentiate single/double/triple presses.
       default: 0.5
       selector:
         number:
@@ -33,162 +32,105 @@ blueprint:
           unit_of_measurement: s
 
     only_active_lights_brightness:
-      name: Pouze zapnutá světla při držení pro jas (top/bottom)
-      description: Pokud je aktivní, hold akce na horním/spodním tlačítku se provedou jen na zapnutých světlech.
+      name: Only active lights for brightness hold
+      description: If enabled, hold actions for top/bottom (brightness up/down) apply only to currently turned-on lights.
       default: false
       selector:
         boolean: {}
 
     only_active_lights_scenes:
-      name: Pouze zapnutá světla při držení pro scény (left/right)
-      description: Pokud je aktivní, hold akce na levém/pravém tlačítku se provedou jen na zapnutých světlech.
+      name: Only active lights for left/right hold
+      description: If enabled, hold actions for left/right apply only to currently turned-on lights.
       default: false
       selector:
         boolean: {}
 
-    # Možnost vybrat scény pro levý a pravý tlačítko při jednotlivých kliknutích:
-    scene_single_left:
-      name: Scéna pro levé tlačítko (single click)
-      description: Vyberte scénu, která se aktivuje při jednom stisku levého tlačítka.
-      default: []
-      selector:
-        entity:
-          domain: scene
-
-    scene_double_left:
-      name: Scéna pro levé tlačítko (double click)
-      description: Vyberte scénu, která se aktivuje při dvojím stisku levého tlačítka.
-      default: []
-      selector:
-        entity:
-          domain: scene
-
-    scene_triple_left:
-      name: Scéna pro levé tlačítko (triple click)
-      description: Vyberte scénu, která se aktivuje při trojím stisku levého tlačítka.
-      default: []
-      selector:
-        entity:
-          domain: scene
-
-    scene_single_right:
-      name: Scéna pro pravé tlačítko (single click)
-      description: Vyberte scénu, která se aktivuje při jednom stisku pravého tlačítka.
-      default: []
-      selector:
-        entity:
-          domain: scene
-
-    scene_double_right:
-      name: Scéna pro pravé tlačítko (double click)
-      description: Vyberte scénu, která se aktivuje při dvojím stisku pravého tlačítka.
-      default: []
-      selector:
-        entity:
-          domain: scene
-
-    scene_triple_right:
-      name: Scéna pro pravé tlačítko (triple click)
-      description: Vyberte scénu, která se aktivuje při trojím stisku pravého tlačítka.
-      default: []
-      selector:
-        entity:
-          domain: scene
-
-    # Akce pro horní tlačítko (klik)
+    # Actions for top button (clicks)
     single_click_action_top:
-      name: Horní tlačítko - jeden klik
+      name: Top button single click
       default: []
       selector:
         action: {}
     double_click_action_top:
-      name: Horní tlačítko - dvojitý klik
+      name: Top button double click
       default: []
       selector:
         action: {}
     triple_click_action_top:
-      name: Horní tlačítko - trojitý klik
+      name: Top button triple click
       default: []
       selector:
         action: {}
 
-    # Akce pro spodní tlačítko (klik)
+    # Actions for bottom button (clicks)
     single_click_action_bottom:
-      name: Spodní tlačítko - jeden klik
+      name: Bottom button single click
       default: []
       selector:
         action: {}
     double_click_action_bottom:
-      name: Spodní tlačítko - dvojitý klik
+      name: Bottom button double click
       default: []
       selector:
         action: {}
     triple_click_action_bottom:
-      name: Spodní tlačítko - trojitý klik
+      name: Bottom button triple click
       default: []
       selector:
         action: {}
 
-    # Akce pro levé tlačítko (klik)
-    # Kromě scén lze definovat další akce
+    # Actions for left button (clicks)
     single_click_action_left:
-      name: Levé tlačítko - jeden klik (kromě scény)
-      description: Zde můžete přidat akci nad rámec nastavené scény.
+      name: Left button single click
       default: []
       selector:
         action: {}
     double_click_action_left:
-      name: Levé tlačítko - dvojitý klik (kromě scény)
+      name: Left button double click
       default: []
       selector:
         action: {}
     triple_click_action_left:
-      name: Levé tlačítko - trojitý klik (kromě scény)
+      name: Left button triple click
       default: []
       selector:
         action: {}
 
-    # Akce pro pravé tlačítko (klik)
+    # Actions for right button (clicks)
     single_click_action_right:
-      name: Pravé tlačítko - jeden klik (kromě scény)
+      name: Right button single click
       default: []
       selector:
         action: {}
     double_click_action_right:
-      name: Pravé tlačítko - dvojitý klik (kromě scény)
+      name: Right button double click
       default: []
       selector:
         action: {}
     triple_click_action_right:
-      name: Pravé tlačítko - trojitý klik (kromě scény)
+      name: Right button triple click
       default: []
       selector:
         action: {}
 
-    # Akce pro držení horního tlačítka (zvýšení jasu)
+    # Hold actions
     hold_increase_top:
-      name: Držení horního tlačítka (zvýšení jasu)
+      name: Hold top (increase brightness)
       default: []
       selector:
         action: {}
-
-    # Akce pro držení spodního tlačítka (snížení jasu)
     hold_decrease_bottom:
-      name: Držení spodního tlačítka (snížení jasu)
+      name: Hold bottom (decrease brightness)
       default: []
       selector:
         action: {}
-
-    # Akce pro držení levého tlačítka
     hold_left:
-      name: Držení levého tlačítka
+      name: Hold left
       default: []
       selector:
         action: {}
-
-    # Akce pro držení pravého tlačítka
     hold_right:
-      name: Držení pravého tlačítka
+      name: Hold right
       default: []
       selector:
         action: {}
@@ -203,7 +145,6 @@ variables:
   command: "{{ trigger.event.data.command }}"
   cluster_id: "{{ trigger.event.data.cluster_id }}"
   endpoint_id: "{{ trigger.event.data.endpoint_id }}"
-  args: "{{ trigger.event.data.args }}"
   wt: !input wait_time
   only_brightness: !input only_active_lights_brightness
   only_scenes: !input only_active_lights_scenes
@@ -231,21 +172,16 @@ variables:
 
 action:
   - choose:
-      # HOLD ACTIONS
       - conditions:
           - condition: template
             value_template: "{{ is_hold }}"
         sequence:
-          # Pokud byste chtěl opravdu aplikovat držení jen na zapnutá světla, 
-          # je potřeba to zajistit v akcích nebo pomocí dodatečných conditions v action.
-          # Tento blueprint poskytuje jen boolean, aby jste při definici akce mohl 
-          # použít condition: state ... is_on apod.
+          # Handle hold actions with optional "only_active" logic
           - choose:
               - conditions:
                   - condition: template
                     value_template: "{{ button_name == 'hold_increase_top' }}"
                 sequence:
-                  # Definujte akce v !input hold_increase_top, uvnitř nich případně podmínky na zapnutá světla
                   - choose:
                       - conditions:
                           - condition: template
@@ -290,7 +226,6 @@ action:
                       - conditions: []
                         sequence: !input hold_right
 
-      # CLICK ACTIONS
       - conditions:
           - condition: template
             value_template: "{{ is_click }}"
@@ -298,7 +233,7 @@ action:
           - variables:
               this_button: "{{ button_name }}"
               click_count: 1
-          # Čekání na druhý stisk
+          # Wait for second click
           - wait_for_trigger:
               - platform: event
                 event_type: zha_event
@@ -313,7 +248,7 @@ action:
                 {% else %}
                   {{ click_count }}
                 {% endif %}
-          # Čekání na třetí stisk
+          # Wait for third click
           - wait_for_trigger:
               - platform: event
                 event_type: zha_event
@@ -329,7 +264,6 @@ action:
                   {{ click_count }}
                 {% endif %}
 
-          # Aplikace akcí podle počtu stisků
           - choose:
               - conditions:
                   - condition: template
@@ -361,52 +295,11 @@ action:
                 sequence:
                   - choose:
                       - conditions: "{{ click_count == 1 }}"
-                        sequence:
-                          - choose:
-                              # Pokud je scéna pro 1x left nastavena
-                              - conditions:
-                                  - condition: template
-                                    value_template: "{{ states('scene_single_left') != 'unknown' and states('scene_single_left') != '' }}"
-                                sequence:
-                                  - service: scene.turn_on
-                                    target:
-                                      entity_id: !input scene_single_left
-                          - service: >
-                              {% if states('scene_single_left') not in ['unknown',''] %}
-                              scene.turn_on
-                              {% endif %}
-                              # Pokud scéna není nastavena, neprovádí se
-                            data: {}
-                            target:
-                              entity_id: !input scene_single_left
-                          - parallel:
-                            - sequence: !input single_click_action_left
-
+                        sequence: !input single_click_action_left
                       - conditions: "{{ click_count == 2 }}"
-                        sequence:
-                          - choose:
-                              - conditions:
-                                  - condition: template
-                                    value_template: "{{ states('scene_double_left') not in ['unknown',''] }}"
-                                sequence:
-                                  - service: scene.turn_on
-                                    target:
-                                      entity_id: !input scene_double_left
-                          - parallel:
-                            - sequence: !input double_click_action_left
-
+                        sequence: !input double_click_action_left
                       - conditions: "{{ click_count == 3 }}"
-                        sequence:
-                          - choose:
-                              - conditions:
-                                  - condition: template
-                                    value_template: "{{ states('scene_triple_left') not in ['unknown',''] }}"
-                                sequence:
-                                  - service: scene.turn_on
-                                    target:
-                                      entity_id: !input scene_triple_left
-                          - parallel:
-                            - sequence: !input triple_click_action_left
+                        sequence: !input triple_click_action_left
 
               - conditions:
                   - condition: template
@@ -414,42 +307,10 @@ action:
                 sequence:
                   - choose:
                       - conditions: "{{ click_count == 1 }}"
-                        sequence:
-                          - choose:
-                              - conditions:
-                                  - condition: template
-                                    value_template: "{{ states('scene_single_right') not in ['unknown',''] }}"
-                                sequence:
-                                  - service: scene.turn_on
-                                    target:
-                                      entity_id: !input scene_single_right
-                          - parallel:
-                            - sequence: !input single_click_action_right
-
+                        sequence: !input single_click_action_right
                       - conditions: "{{ click_count == 2 }}"
-                        sequence:
-                          - choose:
-                              - conditions:
-                                  - condition: template
-                                    value_template: "{{ states('scene_double_right') not in ['unknown',''] }}"
-                                sequence:
-                                  - service: scene.turn_on
-                                    target:
-                                      entity_id: !input scene_double_right
-                          - parallel:
-                            - sequence: !input double_click_action_right
-
+                        sequence: !input double_click_action_right
                       - conditions: "{{ click_count == 3 }}"
-                        sequence:
-                          - choose:
-                              - conditions:
-                                  - condition: template
-                                    value_template: "{{ states('scene_triple_right') not in ['unknown',''] }}"
-                                sequence:
-                                  - service: scene.turn_on
-                                    target:
-                                      entity_id: !input scene_triple_right
-                          - parallel:
-                            - sequence: !input triple_click_action_right
+                        sequence: !input triple_click_action_right
     default: []
 mode: restart
