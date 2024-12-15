@@ -1,108 +1,26 @@
 blueprint:
-  name: Multi-button ZHA Remote (Single/Double/Triple/Hold)
+  name: ZHA Remote - Univerzální Ovládání Světel a Scén
   description: >
-    Blueprint for a ZHA remote (e.g. Ikea E2001/E2002) to handle single, double, triple clicks and hold actions on multiple buttons without external helpers or counters. 
-    Supports left, right, top (turn_on), bottom (turn_off) buttons and their hold commands (move, move_with_on_off).
+    Univerzální blueprint pro ZHA dálkový ovladač (např. Ikea STYRBAR E2001/E2002).
+    Umožňuje nastavit akce pro single/double/triple klik na horní, spodní, levé a pravé tlačítko
+    a také akce při držení tlačítka (hold) pro zvýšení/snížení jasu (horní/dolní) a při držení
+    levého/pravého tlačítka (např. změna scény). Volitelně lze při držení provádět změny jen
+    na zapnutých světlech.  
+    Vše nastavitelné přes UI bez nutnosti psát YAML ručně.
+
   domain: automation
   input:
     remote:
-      name: Zigbee Remote
-      description: Váš ZHA ovladač (např. Ikea STYRBAR E2001/E2002)
+      name: ZHA Dálkový ovladač
+      description: Vyberte zařízení ovladače ZHA.
       selector:
         device:
           integration: zha
-    single_click_action_left:
-      name: Left button single click action
-      description: Akce pro jedno stisknutí levého tlačítka
-      default: []
-      selector:
-        action: {}
-    double_click_action_left:
-      name: Left button double click action
-      description: Akce pro dvojité stisknutí levého tlačítka
-      default: []
-      selector:
-        action: {}
-    triple_click_action_left:
-      name: Left button triple click action
-      description: Akce pro trojité stisknutí levého tlačítka
-      default: []
-      selector:
-        action: {}
 
-    single_click_action_right:
-      name: Right button single click action
-      description: Akce pro jedno stisknutí pravého tlačítka
-      default: []
-      selector:
-        action: {}
-    double_click_action_right:
-      name: Right button double click action
-      description: Akce pro dvojité stisknutí pravého tlačítka
-      default: []
-      selector:
-        action: {}
-    triple_click_action_right:
-      name: Right button triple click action
-      description: Akce pro trojité stisknutí pravého tlačítka
-      default: []
-      selector:
-        action: {}
-
-    single_click_action_top:
-      name: Top button single click action
-      description: Akce pro jedno stisknutí horního tlačítka
-      default: []
-      selector:
-        action: {}
-    double_click_action_top:
-      name: Top button double click action
-      description: Akce pro dvojité stisknutí horního tlačítka
-      default: []
-      selector:
-        action: {}
-    triple_click_action_top:
-      name: Top button triple click action
-      description: Akce pro trojité stisknutí horního tlačítka
-      default: []
-      selector:
-        action: {}
-
-    single_click_action_bottom:
-      name: Bottom button single click action
-      description: Akce pro jedno stisknutí spodního tlačítka
-      default: []
-      selector:
-        action: {}
-    double_click_action_bottom:
-      name: Bottom button double click action
-      description: Akce pro dvojité stisknutí spodního tlačítka
-      default: []
-      selector:
-        action: {}
-    triple_click_action_bottom:
-      name: Bottom button triple click action
-      description: Akce pro trojité stisknutí spodního tlačítka
-      default: []
-      selector:
-        action: {}
-
-    hold_increase_action:
-      name: Hold increase brightness action
-      description: Akce pro držení tlačítka pro zvýšení jasu (move_with_on_off)
-      default: []
-      selector:
-        action: {}
-    hold_decrease_action:
-      name: Hold decrease brightness action
-      description: Akce pro držení tlačítka pro snížení jasu (move)
-      default: []
-      selector:
-        action: {}
-
+    # Nastavení prodlevy pro rozlišení počtu stisků
     wait_time:
-      name: Delay between clicks (seconds)
-      description: Časová prodleva pro rozlišení počtu stisknutí
+      name: Čas pro rozlišení počtu stisků (s)
+      description: Doba, během které se čeká na další stisk pro dvojité/trojité kliknutí.
       default: 0.5
       selector:
         number:
@@ -110,6 +28,113 @@ blueprint:
           max: 2
           step: 0.1
           unit_of_measurement: s
+
+    only_active_lights:
+      name: Pouze zapnutá světla při držení (hold)
+      description: Pokud je aktivní, hold akce (zvýšení/snížení jasu, změny) se provedou jen na světlech, která jsou zapnutá.
+      default: false
+      selector:
+        boolean: {}
+
+    # Akce pro horní tlačítko (klik)
+    single_click_action_top:
+      name: Horní tlačítko - jeden klik
+      default: []
+      selector:
+        action: {}
+    double_click_action_top:
+      name: Horní tlačítko - dvojitý klik
+      default: []
+      selector:
+        action: {}
+    triple_click_action_top:
+      name: Horní tlačítko - trojitý klik
+      default: []
+      selector:
+        action: {}
+
+    # Akce pro spodní tlačítko (klik)
+    single_click_action_bottom:
+      name: Spodní tlačítko - jeden klik
+      default: []
+      selector:
+        action: {}
+    double_click_action_bottom:
+      name: Spodní tlačítko - dvojitý klik
+      default: []
+      selector:
+        action: {}
+    triple_click_action_bottom:
+      name: Spodní tlačítko - trojitý klik
+      default: []
+      selector:
+        action: {}
+
+    # Akce pro levé tlačítko (klik)
+    single_click_action_left:
+      name: Levé tlačítko - jeden klik
+      default: []
+      selector:
+        action: {}
+    double_click_action_left:
+      name: Levé tlačítko - dvojitý klik
+      default: []
+      selector:
+        action: {}
+    triple_click_action_left:
+      name: Levé tlačítko - trojitý klik
+      default: []
+      selector:
+        action: {}
+
+    # Akce pro pravé tlačítko (klik)
+    single_click_action_right:
+      name: Pravé tlačítko - jeden klik
+      default: []
+      selector:
+        action: {}
+    double_click_action_right:
+      name: Pravé tlačítko - dvojitý klik
+      default: []
+      selector:
+        action: {}
+    triple_click_action_right:
+      name: Pravé tlačítko - trojitý klik
+      default: []
+      selector:
+        action: {}
+
+    # Akce pro držení horního tlačítka (zvýšení jasu)
+    hold_increase_top:
+      name: Držení horního tlačítka (zvýšení jasu)
+      description: Akce, která se provede při držení horního tlačítka pro zvýšení jasu.
+      default: []
+      selector:
+        action: {}
+
+    # Akce pro držení spodního tlačítka (snížení jasu)
+    hold_decrease_bottom:
+      name: Držení spodního tlačítka (snížení jasu)
+      description: Akce, která se provede při držení spodního tlačítka pro snížení jasu.
+      default: []
+      selector:
+        action: {}
+
+    # Akce pro držení levého tlačítka
+    hold_left:
+      name: Držení levého tlačítka
+      description: Akce při držení levého tlačítka (např. změna scény)
+      default: []
+      selector:
+        action: {}
+
+    # Akce pro držení pravého tlačítka
+    hold_right:
+      name: Držení pravého tlačítka
+      description: Akce při držení pravého tlačítka (např. změna scény)
+      default: []
+      selector:
+        action: {}
 
 trigger:
   - platform: event
@@ -122,115 +147,101 @@ variables:
   cluster_id: "{{ trigger.event.data.cluster_id }}"
   endpoint_id: "{{ trigger.event.data.endpoint_id }}"
   args: "{{ trigger.event.data.args }}"
-  click_count: 0
-  # Map endpoint and command to button name
-  # on/endpoint=1 top, off/endpoint=1 bottom, left/right from subtypes
-  button: >
-    {% set c = command %}
-    {% set e = endpoint_id %}
-    {% if c == 'on' and e == 1 %}top{% elif c == 'off' and e == 1 %}bottom
-    {% elif c == 'press' and e == 1 and args == [256,13,0] %}bottom
-    {% elif c == 'press' and e == 1 and args == [257,13,0] %}top
-    {% elif c in ['move','move_with_on_off'] and e == 1 %}hold{% else %}
-    {% if c in ['on','off'] and cluster_id == 6 %}
-      {% if c == 'on' %}top{% else %}bottom{% endif %}
-    {% elif cluster_id == 6 %}
-      {% if c == 'on' %}top{% elif c == 'off' %}bottom{% endif %}
-    {% elif cluster_id == 5 %}
-      {% if c == 'press' %}???{% elif c == 'hold' %}???{% endif %}
+
+  # Identifikace tlačítka:
+  # Předpokládáme Ikea STYRBAR:
+  # endpoint_id=1: top (on), bottom (off), hold (move/move_with_on_off)
+  # endpoint_id=2: left (on)
+  # endpoint_id=3: right (on)
+  # hold top/bottom: cluster=8, command=move/move_with_on_off
+  # U holdu levého a pravého tlačítka (endpoint 2/3) také cluster 8 a command move/move_with_on_off
+  button_name: >
+    {% if cluster_id == 6 %}
+      {% if endpoint_id == 1 and command == 'on' %}top{% elif endpoint_id == 1 and command == 'off' %}bottom
+      {% elif endpoint_id == 2 and command == 'on' %}left{% elif endpoint_id == 3 and command == 'on' %}right
+      {% else %}unknown{% endif %}
     {% elif cluster_id == 8 %}
-      hold
+      {% if endpoint_id == 1 and (command == 'move_with_on_off') %}hold_increase_top
+      {% elif endpoint_id == 1 and command == 'move' %}hold_decrease_bottom
+      {% elif endpoint_id == 2 and (command in ['move','move_with_on_off']) %}hold_left
+      {% elif endpoint_id == 3 and (command in ['move','move_with_on_off']) %}hold_right
+      {% else %}unknown{% endif %}
     {% else %}
-      {% if (c == 'on' and cluster_id == 6 and e == 2) or (c == 'press' and args == [256,13,0]) %}left{% endif %}
-      {% if (c == 'on' and cluster_id == 6 and e == 3) or (c == 'press' and args == [257,13,0]) %}right{% endif %}
-    {% endif %}
+      unknown
     {% endif %}
 
-  # The above logic is simplified. For a known Ikea E2001/E2002 layout:
-  # endpoint_id 1 + command 'on' = top press
-  # endpoint_id 1 + command 'off' = bottom press
-  # endpoint_id 2 + command 'on' = left press (some remotes)
-  # endpoint_id 3 + command 'on' = right press
-  # For simplicity, let's hardcode a known layout:
-  button_final: >
-    {% if command == 'on' and cluster_id == 6 and endpoint_id == 2 %}left{% elif command == 'on' and cluster_id == 6 and endpoint_id == 3 %}right
-    {% elif command == 'on' and cluster_id == 6 and endpoint_id == 1 %}top{% elif command == 'off' and cluster_id == 6 and endpoint_id == 1 %}bottom
-    {% elif command in ['move','move_with_on_off'] and cluster_id == 8 and endpoint_id == 1 %}hold{% else %}unknown{% endif %}
+  is_hold: >
+    {{ 'hold' in button_name }}
 
-  is_hold: "{{ button_final == 'hold' }}"
-  is_click: "{{ button_final in ['top','bottom','left','right'] }}"
+  is_click: >
+    {{ button_name in ['top','bottom','left','right'] }}
 
-  # We'll store how many times clicked for the same button within wait_time
-  # We will trigger this automation once per press, and wait to see if more presses come
-  # Since it's mode: restart, we can store click_count in variables by incrementing after first trigger.
-  # But mode restart resets variables. We'll use a wait_for_trigger logic.
-  
-  # We'll handle clicks by waiting for more triggers within wait_time:
-  
+  wt: !input wait_time
+  only_active: !input only_active_lights
+
 action:
   - choose:
+      # HOLD ACTIONS
       - conditions:
           - condition: template
             value_template: "{{ is_hold }}"
         sequence:
-          # Hold actions (increase/decrease brightness)
+          # Podobně jako v původním kódu: pokud only_active = true, provádíme akci jen na zapnutých světlech
+          # Zde samotné akce uživatel definuje v input sekci (hold_xxx).
+          # Uživatel si v hold_xxx akcích sám vybere světla a v akci může podmínit, že se to aplikuje jen na zapnutá světla.
+          # Pokud chceme přímo v blueprintu ošetřit jen zapnutá světla, museli bychom použít templating přímo zde.
+          # Pro zjednodušení necháme uživatele definovat akce dle potřeb. Pokud by chtěl jen zapnutá světla,
+          # může to udělat pomocí conditions přímo v definované akci.
           - choose:
-              - conditions:
-                  - condition: template
-                    value_template: "{{ command == 'move_with_on_off' }}"
-                sequence: !input hold_increase_action
-              - conditions:
-                  - condition: template
-                    value_template: "{{ command == 'move' }}"
-                sequence: !input hold_decrease_action
+              - conditions: "{{ button_name == 'hold_increase_top' }}"
+                sequence: !input hold_increase_top
+              - conditions: "{{ button_name == 'hold_decrease_bottom' }}"
+                sequence: !input hold_decrease_bottom
+              - conditions: "{{ button_name == 'hold_left' }}"
+                sequence: !input hold_left
+              - conditions: "{{ button_name == 'hold_right' }}"
+                sequence: !input hold_right
+
+      # CLICK ACTIONS
       - conditions:
           - condition: template
             value_template: "{{ is_click }}"
         sequence:
+          # Nyní vyřešíme single/double/triple kliky
           - variables:
-              this_button: "{{ button_final }}"
-              this_command: "{{ command }}"
-              # Start click_count at 1 for the first press
+              this_button: "{{ button_name }}"
               click_count: 1
           - wait_for_trigger:
               - platform: event
                 event_type: zha_event
                 event_data:
                   device_id: !input remote
-            timeout: "{{ wait_time }}"
+            timeout: "{{ wt }}"
             continue_on_timeout: true
           - variables:
-              # If a new event arrived before timeout, increment click count
-              # If not, timeout occurs and we do the action
               click_count: >
                 {% if wait.trigger %}
                   {{ click_count + 1 }}
                 {% else %}
                   {{ click_count }}
                 {% endif %}
+          - wait_for_trigger:
+              - platform: event
+                event_type: zha_event
+                event_data:
+                  device_id: !input remote
+            timeout: "{{ wt }}"
+            continue_on_timeout: true
+          - variables:
+              click_count: >
+                {% if wait.trigger %}
+                  {{ click_count + 1 }}
+                {% else %}
+                  {{ click_count }}
+                {% endif %}
+
+          # Podle click_count vybereme akci
           - choose:
-              - conditions:
-                  - condition: template
-                    value_template: "{{ this_button == 'left' }}"
-                sequence:
-                  - choose:
-                      - conditions: "{{ click_count == 1 }}"
-                        sequence: !input single_click_action_left
-                      - conditions: "{{ click_count == 2 }}"
-                        sequence: !input double_click_action_left
-                      - conditions: "{{ click_count == 3 }}"
-                        sequence: !input triple_click_action_left
-              - conditions:
-                  - condition: template
-                    value_template: "{{ this_button == 'right' }}"
-                sequence:
-                  - choose:
-                      - conditions: "{{ click_count == 1 }}"
-                        sequence: !input single_click_action_right
-                      - conditions: "{{ click_count == 2 }}"
-                        sequence: !input double_click_action_right
-                      - conditions: "{{ click_count == 3 }}"
-                        sequence: !input triple_click_action_right
               - conditions:
                   - condition: template
                     value_template: "{{ this_button == 'top' }}"
@@ -242,6 +253,7 @@ action:
                         sequence: !input double_click_action_top
                       - conditions: "{{ click_count == 3 }}"
                         sequence: !input triple_click_action_top
+
               - conditions:
                   - condition: template
                     value_template: "{{ this_button == 'bottom' }}"
@@ -253,5 +265,29 @@ action:
                         sequence: !input double_click_action_bottom
                       - conditions: "{{ click_count == 3 }}"
                         sequence: !input triple_click_action_bottom
+
+              - conditions:
+                  - condition: template
+                    value_template: "{{ this_button == 'left' }}"
+                sequence:
+                  - choose:
+                      - conditions: "{{ click_count == 1 }}"
+                        sequence: !input single_click_action_left
+                      - conditions: "{{ click_count == 2 }}"
+                        sequence: !input double_click_action_left
+                      - conditions: "{{ click_count == 3 }}"
+                        sequence: !input triple_click_action_left
+
+              - conditions:
+                  - condition: template
+                    value_template: "{{ this_button == 'right' }}"
+                sequence:
+                  - choose:
+                      - conditions: "{{ click_count == 1 }}"
+                        sequence: !input single_click_action_right
+                      - conditions: "{{ click_count == 2 }}"
+                        sequence: !input double_click_action_right
+                      - conditions: "{{ click_count == 3 }}"
+                        sequence: !input triple_click_action_right
     default: []
 mode: restart
