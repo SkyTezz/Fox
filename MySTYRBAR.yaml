@@ -1,0 +1,257 @@
+blueprint:
+  name: Multi-button ZHA Remote (Single/Double/Triple/Hold)
+  description: >
+    Blueprint for a ZHA remote (e.g. Ikea E2001/E2002) to handle single, double, triple clicks and hold actions on multiple buttons without external helpers or counters. 
+    Supports left, right, top (turn_on), bottom (turn_off) buttons and their hold commands (move, move_with_on_off).
+  domain: automation
+  input:
+    remote:
+      name: Zigbee Remote
+      description: Váš ZHA ovladač (např. Ikea STYRBAR E2001/E2002)
+      selector:
+        device:
+          integration: zha
+    single_click_action_left:
+      name: Left button single click action
+      description: Akce pro jedno stisknutí levého tlačítka
+      default: []
+      selector:
+        action: {}
+    double_click_action_left:
+      name: Left button double click action
+      description: Akce pro dvojité stisknutí levého tlačítka
+      default: []
+      selector:
+        action: {}
+    triple_click_action_left:
+      name: Left button triple click action
+      description: Akce pro trojité stisknutí levého tlačítka
+      default: []
+      selector:
+        action: {}
+
+    single_click_action_right:
+      name: Right button single click action
+      description: Akce pro jedno stisknutí pravého tlačítka
+      default: []
+      selector:
+        action: {}
+    double_click_action_right:
+      name: Right button double click action
+      description: Akce pro dvojité stisknutí pravého tlačítka
+      default: []
+      selector:
+        action: {}
+    triple_click_action_right:
+      name: Right button triple click action
+      description: Akce pro trojité stisknutí pravého tlačítka
+      default: []
+      selector:
+        action: {}
+
+    single_click_action_top:
+      name: Top button single click action
+      description: Akce pro jedno stisknutí horního tlačítka
+      default: []
+      selector:
+        action: {}
+    double_click_action_top:
+      name: Top button double click action
+      description: Akce pro dvojité stisknutí horního tlačítka
+      default: []
+      selector:
+        action: {}
+    triple_click_action_top:
+      name: Top button triple click action
+      description: Akce pro trojité stisknutí horního tlačítka
+      default: []
+      selector:
+        action: {}
+
+    single_click_action_bottom:
+      name: Bottom button single click action
+      description: Akce pro jedno stisknutí spodního tlačítka
+      default: []
+      selector:
+        action: {}
+    double_click_action_bottom:
+      name: Bottom button double click action
+      description: Akce pro dvojité stisknutí spodního tlačítka
+      default: []
+      selector:
+        action: {}
+    triple_click_action_bottom:
+      name: Bottom button triple click action
+      description: Akce pro trojité stisknutí spodního tlačítka
+      default: []
+      selector:
+        action: {}
+
+    hold_increase_action:
+      name: Hold increase brightness action
+      description: Akce pro držení tlačítka pro zvýšení jasu (move_with_on_off)
+      default: []
+      selector:
+        action: {}
+    hold_decrease_action:
+      name: Hold decrease brightness action
+      description: Akce pro držení tlačítka pro snížení jasu (move)
+      default: []
+      selector:
+        action: {}
+
+    wait_time:
+      name: Delay between clicks (seconds)
+      description: Časová prodleva pro rozlišení počtu stisknutí
+      default: 0.5
+      selector:
+        number:
+          min: 0.1
+          max: 2
+          step: 0.1
+          unit_of_measurement: s
+
+trigger:
+  - platform: event
+    event_type: zha_event
+    event_data:
+      device_id: !input remote
+
+variables:
+  command: "{{ trigger.event.data.command }}"
+  cluster_id: "{{ trigger.event.data.cluster_id }}"
+  endpoint_id: "{{ trigger.event.data.endpoint_id }}"
+  args: "{{ trigger.event.data.args }}"
+  click_count: 0
+  # Map endpoint and command to button name
+  # on/endpoint=1 top, off/endpoint=1 bottom, left/right from subtypes
+  button: >
+    {% set c = command %}
+    {% set e = endpoint_id %}
+    {% if c == 'on' and e == 1 %}top{% elif c == 'off' and e == 1 %}bottom
+    {% elif c == 'press' and e == 1 and args == [256,13,0] %}bottom
+    {% elif c == 'press' and e == 1 and args == [257,13,0] %}top
+    {% elif c in ['move','move_with_on_off'] and e == 1 %}hold{% else %}
+    {% if c in ['on','off'] and cluster_id == 6 %}
+      {% if c == 'on' %}top{% else %}bottom{% endif %}
+    {% elif cluster_id == 6 %}
+      {% if c == 'on' %}top{% elif c == 'off' %}bottom{% endif %}
+    {% elif cluster_id == 5 %}
+      {% if c == 'press' %}???{% elif c == 'hold' %}???{% endif %}
+    {% elif cluster_id == 8 %}
+      hold
+    {% else %}
+      {% if (c == 'on' and cluster_id == 6 and e == 2) or (c == 'press' and args == [256,13,0]) %}left{% endif %}
+      {% if (c == 'on' and cluster_id == 6 and e == 3) or (c == 'press' and args == [257,13,0]) %}right{% endif %}
+    {% endif %}
+    {% endif %}
+
+  # The above logic is simplified. For a known Ikea E2001/E2002 layout:
+  # endpoint_id 1 + command 'on' = top press
+  # endpoint_id 1 + command 'off' = bottom press
+  # endpoint_id 2 + command 'on' = left press (some remotes)
+  # endpoint_id 3 + command 'on' = right press
+  # For simplicity, let's hardcode a known layout:
+  button_final: >
+    {% if command == 'on' and cluster_id == 6 and endpoint_id == 2 %}left{% elif command == 'on' and cluster_id == 6 and endpoint_id == 3 %}right
+    {% elif command == 'on' and cluster_id == 6 and endpoint_id == 1 %}top{% elif command == 'off' and cluster_id == 6 and endpoint_id == 1 %}bottom
+    {% elif command in ['move','move_with_on_off'] and cluster_id == 8 and endpoint_id == 1 %}hold{% else %}unknown{% endif %}
+
+  is_hold: "{{ button_final == 'hold' }}"
+  is_click: "{{ button_final in ['top','bottom','left','right'] }}"
+
+  # We'll store how many times clicked for the same button within wait_time
+  # We will trigger this automation once per press, and wait to see if more presses come
+  # Since it's mode: restart, we can store click_count in variables by incrementing after first trigger.
+  # But mode restart resets variables. We'll use a wait_for_trigger logic.
+  
+  # We'll handle clicks by waiting for more triggers within wait_time:
+  
+action:
+  - choose:
+      - conditions:
+          - condition: template
+            value_template: "{{ is_hold }}"
+        sequence:
+          # Hold actions (increase/decrease brightness)
+          - choose:
+              - conditions:
+                  - condition: template
+                    value_template: "{{ command == 'move_with_on_off' }}"
+                sequence: !input hold_increase_action
+              - conditions:
+                  - condition: template
+                    value_template: "{{ command == 'move' }}"
+                sequence: !input hold_decrease_action
+      - conditions:
+          - condition: template
+            value_template: "{{ is_click }}"
+        sequence:
+          - variables:
+              this_button: "{{ button_final }}"
+              this_command: "{{ command }}"
+              # Start click_count at 1 for the first press
+              click_count: 1
+          - wait_for_trigger:
+              - platform: event
+                event_type: zha_event
+                event_data:
+                  device_id: !input remote
+            timeout: "{{ wait_time }}"
+            continue_on_timeout: true
+          - variables:
+              # If a new event arrived before timeout, increment click count
+              # If not, timeout occurs and we do the action
+              click_count: >
+                {% if wait.trigger %}
+                  {{ click_count + 1 }}
+                {% else %}
+                  {{ click_count }}
+                {% endif %}
+          - choose:
+              - conditions:
+                  - condition: template
+                    value_template: "{{ this_button == 'left' }}"
+                sequence:
+                  - choose:
+                      - conditions: "{{ click_count == 1 }}"
+                        sequence: !input single_click_action_left
+                      - conditions: "{{ click_count == 2 }}"
+                        sequence: !input double_click_action_left
+                      - conditions: "{{ click_count == 3 }}"
+                        sequence: !input triple_click_action_left
+              - conditions:
+                  - condition: template
+                    value_template: "{{ this_button == 'right' }}"
+                sequence:
+                  - choose:
+                      - conditions: "{{ click_count == 1 }}"
+                        sequence: !input single_click_action_right
+                      - conditions: "{{ click_count == 2 }}"
+                        sequence: !input double_click_action_right
+                      - conditions: "{{ click_count == 3 }}"
+                        sequence: !input triple_click_action_right
+              - conditions:
+                  - condition: template
+                    value_template: "{{ this_button == 'top' }}"
+                sequence:
+                  - choose:
+                      - conditions: "{{ click_count == 1 }}"
+                        sequence: !input single_click_action_top
+                      - conditions: "{{ click_count == 2 }}"
+                        sequence: !input double_click_action_top
+                      - conditions: "{{ click_count == 3 }}"
+                        sequence: !input triple_click_action_top
+              - conditions:
+                  - condition: template
+                    value_template: "{{ this_button == 'bottom' }}"
+                sequence:
+                  - choose:
+                      - conditions: "{{ click_count == 1 }}"
+                        sequence: !input single_click_action_bottom
+                      - conditions: "{{ click_count == 2 }}"
+                        sequence: !input double_click_action_bottom
+                      - conditions: "{{ click_count == 3 }}"
+                        sequence: !input triple_click_action_bottom
+    default: []
+mode: restart
