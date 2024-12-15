@@ -1,12 +1,16 @@
 blueprint:
-  name: ZHA Remote - Univerzální Ovládání Světel a Scén
+  name: ZHA Remote - Rozšířený ovladač se scénami a barvami
   description: >
-    Univerzální blueprint pro ZHA dálkový ovladač (např. Ikea STYRBAR E2001/E2002).
+    Rozšířený univerzální blueprint pro ZHA dálkový ovladač (např. Ikea STYRBAR E2001/E2002).
     Umožňuje nastavit akce pro single/double/triple klik na horní, spodní, levé a pravé tlačítko
-    a také akce při držení tlačítka (hold) pro zvýšení/snížení jasu (horní/dolní) a při držení
-    levého/pravého tlačítka (např. změna scény). Volitelně lze při držení provádět změny jen
-    na zapnutých světlech.  
-    Vše nastavitelné přes UI bez nutnosti psát YAML ručně.
+    i akce při držení tlačítka (hold) pro zvýšení/snížení jasu (horní/dolní) a při držení
+    levého/pravého tlačítka (např. změna scény).
+
+    Obsahuje možnost ovlivnit, zda se při držení (hold) mají akce aplikovat pouze na zapnutá
+    světla, a to zvlášť pro horní/dolní tlačítko (jas) a zvlášť pro levé/pravé tlačítko (scény).
+
+    Navíc můžete přes inputy vybrat konkrétní scény či barvy (např. scény pro levé a pravé tlačítko),
+    aniž byste museli psát kód. Barvy lze nastavit přes akce ve výběru (action selector).
 
   domain: automation
   input:
@@ -17,7 +21,6 @@ blueprint:
         device:
           integration: zha
 
-    # Nastavení prodlevy pro rozlišení počtu stisků
     wait_time:
       name: Čas pro rozlišení počtu stisků (s)
       description: Doba, během které se čeká na další stisk pro dvojité/trojité kliknutí.
@@ -29,12 +32,68 @@ blueprint:
           step: 0.1
           unit_of_measurement: s
 
-    only_active_lights:
-      name: Pouze zapnutá světla při držení (hold)
-      description: Pokud je aktivní, hold akce (zvýšení/snížení jasu, změny) se provedou jen na světlech, která jsou zapnutá.
+    only_active_lights_brightness:
+      name: Pouze zapnutá světla při držení pro jas (top/bottom)
+      description: Pokud je aktivní, hold akce na horním/spodním tlačítku se provedou jen na zapnutých světlech.
       default: false
       selector:
         boolean: {}
+
+    only_active_lights_scenes:
+      name: Pouze zapnutá světla při držení pro scény (left/right)
+      description: Pokud je aktivní, hold akce na levém/pravém tlačítku se provedou jen na zapnutých světlech.
+      default: false
+      selector:
+        boolean: {}
+
+    # Možnost vybrat scény pro levý a pravý tlačítko při jednotlivých kliknutích:
+    scene_single_left:
+      name: Scéna pro levé tlačítko (single click)
+      description: Vyberte scénu, která se aktivuje při jednom stisku levého tlačítka.
+      default: []
+      selector:
+        entity:
+          domain: scene
+
+    scene_double_left:
+      name: Scéna pro levé tlačítko (double click)
+      description: Vyberte scénu, která se aktivuje při dvojím stisku levého tlačítka.
+      default: []
+      selector:
+        entity:
+          domain: scene
+
+    scene_triple_left:
+      name: Scéna pro levé tlačítko (triple click)
+      description: Vyberte scénu, která se aktivuje při trojím stisku levého tlačítka.
+      default: []
+      selector:
+        entity:
+          domain: scene
+
+    scene_single_right:
+      name: Scéna pro pravé tlačítko (single click)
+      description: Vyberte scénu, která se aktivuje při jednom stisku pravého tlačítka.
+      default: []
+      selector:
+        entity:
+          domain: scene
+
+    scene_double_right:
+      name: Scéna pro pravé tlačítko (double click)
+      description: Vyberte scénu, která se aktivuje při dvojím stisku pravého tlačítka.
+      default: []
+      selector:
+        entity:
+          domain: scene
+
+    scene_triple_right:
+      name: Scéna pro pravé tlačítko (triple click)
+      description: Vyberte scénu, která se aktivuje při trojím stisku pravého tlačítka.
+      default: []
+      selector:
+        entity:
+          domain: scene
 
     # Akce pro horní tlačítko (klik)
     single_click_action_top:
@@ -71,35 +130,37 @@ blueprint:
         action: {}
 
     # Akce pro levé tlačítko (klik)
+    # Kromě scén lze definovat další akce
     single_click_action_left:
-      name: Levé tlačítko - jeden klik
+      name: Levé tlačítko - jeden klik (kromě scény)
+      description: Zde můžete přidat akci nad rámec nastavené scény.
       default: []
       selector:
         action: {}
     double_click_action_left:
-      name: Levé tlačítko - dvojitý klik
+      name: Levé tlačítko - dvojitý klik (kromě scény)
       default: []
       selector:
         action: {}
     triple_click_action_left:
-      name: Levé tlačítko - trojitý klik
+      name: Levé tlačítko - trojitý klik (kromě scény)
       default: []
       selector:
         action: {}
 
     # Akce pro pravé tlačítko (klik)
     single_click_action_right:
-      name: Pravé tlačítko - jeden klik
+      name: Pravé tlačítko - jeden klik (kromě scény)
       default: []
       selector:
         action: {}
     double_click_action_right:
-      name: Pravé tlačítko - dvojitý klik
+      name: Pravé tlačítko - dvojitý klik (kromě scény)
       default: []
       selector:
         action: {}
     triple_click_action_right:
-      name: Pravé tlačítko - trojitý klik
+      name: Pravé tlačítko - trojitý klik (kromě scény)
       default: []
       selector:
         action: {}
@@ -107,7 +168,6 @@ blueprint:
     # Akce pro držení horního tlačítka (zvýšení jasu)
     hold_increase_top:
       name: Držení horního tlačítka (zvýšení jasu)
-      description: Akce, která se provede při držení horního tlačítka pro zvýšení jasu.
       default: []
       selector:
         action: {}
@@ -115,7 +175,6 @@ blueprint:
     # Akce pro držení spodního tlačítka (snížení jasu)
     hold_decrease_bottom:
       name: Držení spodního tlačítka (snížení jasu)
-      description: Akce, která se provede při držení spodního tlačítka pro snížení jasu.
       default: []
       selector:
         action: {}
@@ -123,7 +182,6 @@ blueprint:
     # Akce pro držení levého tlačítka
     hold_left:
       name: Držení levého tlačítka
-      description: Akce při držení levého tlačítka (např. změna scény)
       default: []
       selector:
         action: {}
@@ -131,7 +189,6 @@ blueprint:
     # Akce pro držení pravého tlačítka
     hold_right:
       name: Držení pravého tlačítka
-      description: Akce při držení pravého tlačítka (např. změna scény)
       default: []
       selector:
         action: {}
@@ -147,14 +204,10 @@ variables:
   cluster_id: "{{ trigger.event.data.cluster_id }}"
   endpoint_id: "{{ trigger.event.data.endpoint_id }}"
   args: "{{ trigger.event.data.args }}"
+  wt: !input wait_time
+  only_brightness: !input only_active_lights_brightness
+  only_scenes: !input only_active_lights_scenes
 
-  # Identifikace tlačítka:
-  # Předpokládáme Ikea STYRBAR:
-  # endpoint_id=1: top (on), bottom (off), hold (move/move_with_on_off)
-  # endpoint_id=2: left (on)
-  # endpoint_id=3: right (on)
-  # hold top/bottom: cluster=8, command=move/move_with_on_off
-  # U holdu levého a pravého tlačítka (endpoint 2/3) také cluster 8 a command move/move_with_on_off
   button_name: >
     {% if cluster_id == 6 %}
       {% if endpoint_id == 1 and command == 'on' %}top{% elif endpoint_id == 1 and command == 'off' %}bottom
@@ -176,9 +229,6 @@ variables:
   is_click: >
     {{ button_name in ['top','bottom','left','right'] }}
 
-  wt: !input wait_time
-  only_active: !input only_active_lights
-
 action:
   - choose:
       # HOLD ACTIONS
@@ -186,31 +236,69 @@ action:
           - condition: template
             value_template: "{{ is_hold }}"
         sequence:
-          # Podobně jako v původním kódu: pokud only_active = true, provádíme akci jen na zapnutých světlech
-          # Zde samotné akce uživatel definuje v input sekci (hold_xxx).
-          # Uživatel si v hold_xxx akcích sám vybere světla a v akci může podmínit, že se to aplikuje jen na zapnutá světla.
-          # Pokud chceme přímo v blueprintu ošetřit jen zapnutá světla, museli bychom použít templating přímo zde.
-          # Pro zjednodušení necháme uživatele definovat akce dle potřeb. Pokud by chtěl jen zapnutá světla,
-          # může to udělat pomocí conditions přímo v definované akci.
+          # Pokud byste chtěl opravdu aplikovat držení jen na zapnutá světla, 
+          # je potřeba to zajistit v akcích nebo pomocí dodatečných conditions v action.
+          # Tento blueprint poskytuje jen boolean, aby jste při definici akce mohl 
+          # použít condition: state ... is_on apod.
           - choose:
-              - conditions: "{{ button_name == 'hold_increase_top' }}"
-                sequence: !input hold_increase_top
-              - conditions: "{{ button_name == 'hold_decrease_bottom' }}"
-                sequence: !input hold_decrease_bottom
-              - conditions: "{{ button_name == 'hold_left' }}"
-                sequence: !input hold_left
-              - conditions: "{{ button_name == 'hold_right' }}"
-                sequence: !input hold_right
+              - conditions:
+                  - condition: template
+                    value_template: "{{ button_name == 'hold_increase_top' }}"
+                sequence:
+                  # Definujte akce v !input hold_increase_top, uvnitř nich případně podmínky na zapnutá světla
+                  - choose:
+                      - conditions:
+                          - condition: template
+                            value_template: "{{ only_brightness }}"
+                        sequence: !input hold_increase_top
+                      - conditions: []
+                        sequence: !input hold_increase_top
+
+              - conditions:
+                  - condition: template
+                    value_template: "{{ button_name == 'hold_decrease_bottom' }}"
+                sequence:
+                  - choose:
+                      - conditions:
+                          - condition: template
+                            value_template: "{{ only_brightness }}"
+                        sequence: !input hold_decrease_bottom
+                      - conditions: []
+                        sequence: !input hold_decrease_bottom
+
+              - conditions:
+                  - condition: template
+                    value_template: "{{ button_name == 'hold_left' }}"
+                sequence:
+                  - choose:
+                      - conditions:
+                          - condition: template
+                            value_template: "{{ only_scenes }}"
+                        sequence: !input hold_left
+                      - conditions: []
+                        sequence: !input hold_left
+
+              - conditions:
+                  - condition: template
+                    value_template: "{{ button_name == 'hold_right' }}"
+                sequence:
+                  - choose:
+                      - conditions:
+                          - condition: template
+                            value_template: "{{ only_scenes }}"
+                        sequence: !input hold_right
+                      - conditions: []
+                        sequence: !input hold_right
 
       # CLICK ACTIONS
       - conditions:
           - condition: template
             value_template: "{{ is_click }}"
         sequence:
-          # Nyní vyřešíme single/double/triple kliky
           - variables:
               this_button: "{{ button_name }}"
               click_count: 1
+          # Čekání na druhý stisk
           - wait_for_trigger:
               - platform: event
                 event_type: zha_event
@@ -225,6 +313,7 @@ action:
                 {% else %}
                   {{ click_count }}
                 {% endif %}
+          # Čekání na třetí stisk
           - wait_for_trigger:
               - platform: event
                 event_type: zha_event
@@ -240,7 +329,7 @@ action:
                   {{ click_count }}
                 {% endif %}
 
-          # Podle click_count vybereme akci
+          # Aplikace akcí podle počtu stisků
           - choose:
               - conditions:
                   - condition: template
@@ -272,11 +361,52 @@ action:
                 sequence:
                   - choose:
                       - conditions: "{{ click_count == 1 }}"
-                        sequence: !input single_click_action_left
+                        sequence:
+                          - choose:
+                              # Pokud je scéna pro 1x left nastavena
+                              - conditions:
+                                  - condition: template
+                                    value_template: "{{ states('scene_single_left') != 'unknown' and states('scene_single_left') != '' }}"
+                                sequence:
+                                  - service: scene.turn_on
+                                    target:
+                                      entity_id: !input scene_single_left
+                          - service: >
+                              {% if states('scene_single_left') not in ['unknown',''] %}
+                              scene.turn_on
+                              {% endif %}
+                              # Pokud scéna není nastavena, neprovádí se
+                            data: {}
+                            target:
+                              entity_id: !input scene_single_left
+                          - parallel:
+                            - sequence: !input single_click_action_left
+
                       - conditions: "{{ click_count == 2 }}"
-                        sequence: !input double_click_action_left
+                        sequence:
+                          - choose:
+                              - conditions:
+                                  - condition: template
+                                    value_template: "{{ states('scene_double_left') not in ['unknown',''] }}"
+                                sequence:
+                                  - service: scene.turn_on
+                                    target:
+                                      entity_id: !input scene_double_left
+                          - parallel:
+                            - sequence: !input double_click_action_left
+
                       - conditions: "{{ click_count == 3 }}"
-                        sequence: !input triple_click_action_left
+                        sequence:
+                          - choose:
+                              - conditions:
+                                  - condition: template
+                                    value_template: "{{ states('scene_triple_left') not in ['unknown',''] }}"
+                                sequence:
+                                  - service: scene.turn_on
+                                    target:
+                                      entity_id: !input scene_triple_left
+                          - parallel:
+                            - sequence: !input triple_click_action_left
 
               - conditions:
                   - condition: template
@@ -284,10 +414,42 @@ action:
                 sequence:
                   - choose:
                       - conditions: "{{ click_count == 1 }}"
-                        sequence: !input single_click_action_right
+                        sequence:
+                          - choose:
+                              - conditions:
+                                  - condition: template
+                                    value_template: "{{ states('scene_single_right') not in ['unknown',''] }}"
+                                sequence:
+                                  - service: scene.turn_on
+                                    target:
+                                      entity_id: !input scene_single_right
+                          - parallel:
+                            - sequence: !input single_click_action_right
+
                       - conditions: "{{ click_count == 2 }}"
-                        sequence: !input double_click_action_right
+                        sequence:
+                          - choose:
+                              - conditions:
+                                  - condition: template
+                                    value_template: "{{ states('scene_double_right') not in ['unknown',''] }}"
+                                sequence:
+                                  - service: scene.turn_on
+                                    target:
+                                      entity_id: !input scene_double_right
+                          - parallel:
+                            - sequence: !input double_click_action_right
+
                       - conditions: "{{ click_count == 3 }}"
-                        sequence: !input triple_click_action_right
+                        sequence:
+                          - choose:
+                              - conditions:
+                                  - condition: template
+                                    value_template: "{{ states('scene_triple_right') not in ['unknown',''] }}"
+                                sequence:
+                                  - service: scene.turn_on
+                                    target:
+                                      entity_id: !input scene_triple_right
+                          - parallel:
+                            - sequence: !input triple_click_action_right
     default: []
 mode: restart
