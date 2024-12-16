@@ -1,26 +1,25 @@
 blueprint:
-  name: ZHA Remote - Univerzální Ovládání (Čisté akce s volitelným filtrem zapnutých světel)
+  name: ZHA Remote - Universal Control (with separate active-lights filters)
   description: >
-    Univerzální blueprint pro ZHA dálkový ovladač (např. Ikea STYRBAR E2001/E2002).
-    Umožňuje nastavit akce pro single/double/triple klik na horní, spodní, levé a pravé tlačítko,
-    a také akce při držení tlačítka (hold) pro zvýšení/snížení jasu (horní/dolní) a při držení
-    levého/pravého tlačítka.  
+    A universal blueprint for a ZHA remote (e.g., Ikea STYRBAR E2001/E2002) that supports:
+    - Single/double/triple click actions on top, bottom, left, and right buttons.
+    - Hold actions for brightness control (top/bottom) and custom hold actions for left/right buttons.
+    
+    Additionally, you can independently configure whether hold actions for brightness (top/bottom),
+    left, and right buttons should only apply to lights that are currently turned on.
 
-    Navíc lze samostatně nastavit, zda se při držení horního/spodního tlačítka (pro jas),
-    levého tlačítka a pravého tlačítka mají akce provést pouze na aktuálně zapnutých světlech.
-  
   domain: automation
   input:
     remote:
-      name: ZHA Dálkový ovladač
-      description: Vyberte zařízení ZHA ovladače.
+      name: ZHA Remote
+      description: Select your ZHA remote device.
       selector:
         device:
           integration: zha
 
     wait_time:
-      name: Čas pro rozlišení počtu stisků (s)
-      description: Doba, po kterou se čeká na další stisk pro dvojité/trojité kliknutí.
+      name: Delay for multi-click detection (seconds)
+      description: The time window to detect double/triple clicks.
       default: 0.5
       selector:
         number:
@@ -30,118 +29,115 @@ blueprint:
           unit_of_measurement: s
 
     only_active_lights_brightness:
-      name: Pouze zapnutá světla pro hold horní/dolní (jas)
-      description: Pokud zapnuto, hold akce pro zvýšení/snížení jasu (horní/dolní) se aplikují jen na zapnutá světla.
+      name: Only active lights for brightness hold (top/bottom)
+      description: If enabled, hold actions for brightness up/down only apply to lights that are turned on.
       default: false
       selector:
         boolean: {}
 
     only_active_lights_left:
-      name: Pouze zapnutá světla pro hold levého tlačítka
-      description: Pokud zapnuto, hold akce levého tlačítka se aplikují jen na zapnutá světla.
+      name: Only active lights for left button hold
+      description: If enabled, hold actions for the left button only apply to lights that are turned on.
       default: false
       selector:
         boolean: {}
 
     only_active_lights_right:
-      name: Pouze zapnutá světla pro hold pravého tlačítka
-      description: Pokud zapnuto, hold akce pravého tlačítka se aplikují jen na zapnutá světla.
+      name: Only active lights for right button hold
+      description: If enabled, hold actions for the right button only apply to lights that are turned on.
       default: false
       selector:
         boolean: {}
 
-    # Akce pro horní tlačítko (klik)
+    # Actions for top button (click)
     single_click_action_top:
-      name: Horní tlačítko - jeden klik
+      name: Top button - single click
       default: []
       selector:
         action: {}
     double_click_action_top:
-      name: Horní tlačítko - dvojitý klik
+      name: Top button - double click
       default: []
       selector:
         action: {}
     triple_click_action_top:
-      name: Horní tlačítko - trojitý klik
+      name: Top button - triple click
       default: []
       selector:
         action: {}
 
-    # Akce pro spodní tlačítko (klik)
+    # Actions for bottom button (click)
     single_click_action_bottom:
-      name: Spodní tlačítko - jeden klik
+      name: Bottom button - single click
       default: []
       selector:
         action: {}
     double_click_action_bottom:
-      name: Spodní tlačítko - dvojitý klik
+      name: Bottom button - double click
       default: []
       selector:
         action: {}
     triple_click_action_bottom:
-      name: Spodní tlačítko - trojitý klik
+      name: Bottom button - triple click
       default: []
       selector:
         action: {}
 
-    # Akce pro levé tlačítko (klik)
+    # Actions for left button (click)
     single_click_action_left:
-      name: Levé tlačítko - jeden klik
+      name: Left button - single click
       default: []
       selector:
         action: {}
     double_click_action_left:
-      name: Levé tlačítko - dvojitý klik
+      name: Left button - double click
       default: []
       selector:
         action: {}
     triple_click_action_left:
-      name: Levé tlačítko - trojitý klik
+      name: Left button - triple click
       default: []
       selector:
         action: {}
 
-    # Akce pro pravé tlačítko (klik)
+    # Actions for right button (click)
     single_click_action_right:
-      name: Pravé tlačítko - jeden klik
+      name: Right button - single click
       default: []
       selector:
         action: {}
     double_click_action_right:
-      name: Pravé tlačítko - dvojitý klik
+      name: Right button - double click
       default: []
       selector:
         action: {}
     triple_click_action_right:
-      name: Pravé tlačítko - trojitý klik
+      name: Right button - triple click
       default: []
       selector:
         action: {}
 
-    # Akce pro držení horního tlačítka (zvýšení jasu)
+    # Hold actions
     hold_increase_top:
-      name: Držení horního tlačítka (zvýšení jasu)
+      name: Hold top button (increase brightness)
       default: []
       selector:
         action: {}
 
-    # Akce pro držení spodního tlačítka (snížení jasu)
     hold_decrease_bottom:
-      name: Držení spodního tlačítka (snížení jasu)
+      name: Hold bottom button (decrease brightness)
       default: []
       selector:
         action: {}
 
-    # Akce pro držení levého tlačítka
     hold_left:
-      name: Držení levého tlačítka
+      name: Hold left button
       default: []
       selector:
         action: {}
 
-    # Akce pro držení pravého tlačítka
     hold_right:
-      name: Držení pravého tlačítka
+      name: Hold right button
       default: []
       selector:
         action: {}
@@ -163,8 +159,10 @@ variables:
 
   button_name: >
     {% if cluster_id == 6 %}
-      {% if endpoint_id == 1 and command == 'on' %}top{% elif endpoint_id == 1 and command == 'off' %}bottom
-      {% elif endpoint_id == 2 and command == 'on' %}left{% elif endpoint_id == 3 and command == 'on' %}right
+      {% if endpoint_id == 1 and command == 'on' %}top
+      {% elif endpoint_id == 1 and command == 'off' %}bottom
+      {% elif endpoint_id == 2 and command == 'on' %}left
+      {% elif endpoint_id == 3 and command == 'on' %}right
       {% else %}unknown{% endif %}
     {% elif cluster_id == 8 %}
       {% if endpoint_id == 1 and (command == 'move_with_on_off') %}hold_increase_top
@@ -184,7 +182,6 @@ variables:
 
 action:
   - choose:
-      # HOLD ACTIONS
       - conditions:
           - condition: template
             value_template: "{{ is_hold }}"
@@ -230,7 +227,6 @@ action:
                       - conditions: []
                         sequence: !input hold_right
 
-      # CLICK ACTIONS
       - conditions:
           - condition: template
             value_template: "{{ is_click }}"
@@ -238,6 +234,7 @@ action:
           - variables:
               this_button: "{{ button_name }}"
               click_count: 1
+          # Wait for second click
           - wait_for_trigger:
               - platform: event
                 event_type: zha_event
@@ -253,6 +250,7 @@ action:
                   {{ click_count }}
                 {% endif %}
 
+          # Wait for third click
           - wait_for_trigger:
               - platform: event
                 event_type: zha_event
